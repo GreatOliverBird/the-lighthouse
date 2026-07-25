@@ -4,6 +4,7 @@ html, body {
 
 body{
     background-color: black;
+    color : white;
 }
 a, .btn-link {
     color: #006bb7;

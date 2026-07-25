@@ -1,0 +1,46 @@
+@rendermode InteractiveServer
+@if (showBanner)
+{
+    <div class="cookie-banner">
+
+        <div class="cookie-title">
+            🍪 Cookie Notice
+        </div>
+
+        <div class="cookie-text">
+            We use cookies to enhance your browsing experience, analyze traffic, and
+            improve your experience on <strong>The Lighthouse</strong>. By clicking
+            <strong>Accept</strong>, you agree to our use of cookies.
+        </div>
+
+        <div class="cookie-actions">
+
+            <button class="cookie-btn cookie-btn-decline"
+                    @onclick="Decline">
+                Decline
+            </button>
+
+            <button class="cookie-btn cookie-btn-accept"
+                    @onclick="Accept">
+                Accept
+            </button>
+
+        </div>
+
+    </div>
+}
+
+@code{
+
+    private bool showBanner = true;
+
+    private void Accept()
+    {
+        showBanner = false;
+    }
+
+    private void Decline()
+    {
+        showBanner= false;
+    }
+}

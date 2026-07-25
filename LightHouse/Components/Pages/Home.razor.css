@@ -1,0 +1,130 @@
+/* home.css */
+
+/* Reset & full page */
+.page-wrapper {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    background-color: #000;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Top-left brand */
+.top-left {
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    z-index: 10;
+}
+
+.top-left h1 {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+/* Center logo */
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+}
+
+.main-logo {
+    width: 400px;
+    height: auto;
+    max-width: 85%;
+    display: block;
+}
+
+/* Bottom-right tagline + button */
+.bottom-right {
+    position: absolute;
+    bottom: 50px;
+    right: 50px;
+    text-align: right;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.tagline {
+    color: white;
+    font-size: 1.2rem;
+    margin: 0;
+    letter-spacing: 1px;
+    opacity: 0.8;
+    font-weight: 300;
+}
+
+/* Minimalistic button */
+.explore-btn {
+    background: transparent;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 10px 28px;
+    border-radius: 50px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+    font-weight: 400;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Hover: turns red */
+.explore-btn:hover {
+    background: #FF3B30;
+    color: white;
+    border-color: #FF3B30;
+    box-shadow: 0 0 20px rgba(255, 59, 48, 0.4);
+    transform: scale(1.05);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .top-left {
+        top: 20px;
+        left: 20px;
+    }
+    .top-left h1 {
+        font-size: 1.2rem;
+    }
+    .main-logo {
+        width: 250px;
+    }
+    .bottom-right {
+        bottom: 25px;
+        right: 20px;
+    }
+    .tagline {
+        font-size: 0.9rem;
+    }
+    .explore-btn {
+        padding: 8px 20px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-logo {
+        width: 180px;
+    }
+    .top-left h1 {
+        font-size: 1rem;
+    }
+    .bottom-right {
+        bottom: 15px;
+        right: 15px;
+    }
+}

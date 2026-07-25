@@ -1,7 +1,33 @@
 ﻿@page "/"
+@rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
+<div class="page-wrapper">
+    <!-- Top-left: Brand name -->
+    <div class="top-left">
+        <h1>THE LIGHTHOUSE</h1>
+    </div>
+
+    <!-- Center: Logo only -->
+    <div class="logo-container">
+        <img src="/Pictures/Logo.png" alt="The LIGHTHOUSE Logo" class="main-logo" />
+    </div>
+
+    <!-- Bottom-right: Tagline + Button -->
+    <div class="bottom-right">
+        <p class="tagline">Your Block-Chain Guide</p>
+        <button class="explore-btn" @onclick="NavigateToExplore">Continue Exploring</button>
+    </div>
+</div>
+
+<CookieConsent/>
+@code {
+    [Inject] NavigationManager Navigation { get; set; }
+
+    void NavigateToExplore()
+    {
+        Navigation.NavigateTo("/explore");
+    }
+}
