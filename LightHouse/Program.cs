@@ -1,10 +1,14 @@
 using LightHouse.Components;
+using LightHouse.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+
+builder.Services.AddScoped<INetworkService, MockNetworkService>();
 
 var app = builder.Build();
 

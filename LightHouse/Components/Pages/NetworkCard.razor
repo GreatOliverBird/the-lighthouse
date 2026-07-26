@@ -1,0 +1,78 @@
+@using LightHouse.Models
+
+@if (Network is not null)
+{
+    <div class="network-card">
+
+        <div class="card-header">
+
+            <div class="network-info">
+
+                <img src="@Network.LogoUrl"
+                     alt="@Network.Name"
+                     class="network-logo" />
+
+                <div>
+
+                    <div class="network-name">
+                        @Network.Name
+                    </div>
+
+                    <div class="network-symbol">
+                        @Network.Symbol
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="network-status @Network.Status.ToString().ToLower()">
+                @Network.Status
+            </div>
+
+        </div>
+
+
+        <div class="metrics">
+
+            <div class="metric">
+                <span>Gas Fee</span>
+                <strong>@Network.GasFee @Network.GasUnit</strong>
+            </div>
+
+            <div class="metric">
+                <span>TPS</span>
+                <strong>@Network.TransactionsPerSecond</strong>
+            </div>
+
+            <div class="metric">
+                <span>Congestion</span>
+                <strong>@Network.Congestion</strong>
+            </div>
+
+            <div class="metric">
+                <span>Finality</span>
+                <strong>@Network.FinalitySeconds s</strong>
+            </div>
+
+        </div>
+
+
+        <div class="last-update">
+            Updated @Network.LastUpdated.ToLocalTime().ToString("HH:mm:ss")
+        </div>
+
+
+        <button class="details-btn">
+            View Network →
+        </button>
+
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public Network? Network { get; set; }
+
+}

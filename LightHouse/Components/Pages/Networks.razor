@@ -1,0 +1,59 @@
+@page "/Networks"
+
+@using LightHouse.Models
+@using LightHouse.Services
+
+@inject INetworkService NetworkService 
+
+
+<PageTitle>Networks</PageTitle>
+
+<div class="networks-page">
+
+    <div class="page-header">
+
+        <h1>NETWORKS</h1>
+
+        <p>
+            Live status of the world's largest blockchain networks.
+        </p>
+
+    </div>
+
+    <div class="search-container">
+
+        <input
+            type="text"
+            placeholder="Search network..." />
+
+    </div>
+
+    <div class="network-grid">
+
+        @if (NetworkList.Count == 0)
+        {
+            <p>Loading networks...</p>
+        }
+        else
+        {
+            @foreach (var network in NetworkList)
+            {
+                <NetworkCard Network="network" />
+            }
+        }
+
+    </div>
+
+</div>
+
+
+@code {
+
+    private List<Network> NetworkList = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        NetworkList = await NetworkService.GetNetworksAsync();
+    }
+
+}
