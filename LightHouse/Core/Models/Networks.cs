@@ -1,4 +1,4 @@
-namespace LightHouse.Models;
+namespace LightHouse.Core.Models;
 
 public class Network
 {

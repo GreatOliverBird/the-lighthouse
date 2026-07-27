@@ -1,6 +1,4 @@
-using LightHouse.Models;
-
-namespace LightHouse.Services;
+namespace LightHouse.Core.Models;
 
 public class MockNetworkService : INetworkService
 {

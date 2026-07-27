@@ -1,5 +1,5 @@
 using LightHouse.Components;
-using LightHouse.Services;
+using LightHouse.Core.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
