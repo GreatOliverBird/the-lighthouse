@@ -1,33 +1,95 @@
 ﻿@page "/"
 @rendermode InteractiveServer
+@using LightHouse.Core.Models
+@inject INetworkService NetworkService
+@inject NavigationManager Navigation
 
-<PageTitle>Home</PageTitle>
+<PageTitle>The Lighthouse</PageTitle>
 
+<div class="home-page">
+    <section class="hero">
+        <div class="hero-copy">
+            <p class="eyebrow">Your blockchain guide</p>
+            <h1>See which network is worth using — right now.</h1>
+            <p class="lede">
+                Live status, gas fees, congestion, and finality across the chains that matter.
+            </p>
+            <div class="hero-actions">
+                <button type="button" class="btn-primary" @onclick="GoNetworks">Explore networks</button>
+                <a class="btn-ghost" href="#featured">Featured status</a>
+            </div>
+        </div>
 
-<div class="page-wrapper">
-    <!-- Top-left: Brand name -->
-    <div class="top-left">
-        <h1>THE LIGHTHOUSE</h1>
-    </div>
+        <div class="hero-panel" aria-hidden="true">
+            <div class="hero-glow"></div>
+            <img src="/Pictures/Logo.png" alt="" class="hero-logo" />
+        </div>
+    </section>
 
-    <!-- Center: Logo only -->
-    <div class="logo-container">
-        <img src="/Pictures/Logo.png" alt="The LIGHTHOUSE Logo" class="main-logo" />
-    </div>
+    <section id="featured" class="featured">
+        <div class="section-head">
+            <h2>Network pulse</h2>
+            <p>A quick look at current conditions across major chains.</p>
+        </div>
 
-    <!-- Bottom-right: Tagline + Button -->
-    <div class="bottom-right">
-        <p class="tagline">Your Block-Chain Guide</p>
-        <button class="explore-btn" @onclick="NavigateToExplore">Continue Exploring</button>
-    </div>
+        @if (Featured.Count == 0)
+        {
+            <div class="pulse-grid">
+                @for (var i = 0; i < 3; i++)
+                {
+                    <div class="pulse-skeleton"></div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="pulse-grid">
+                @foreach (var network in Featured)
+                {
+                    <button type="button" class="pulse-card" @onclick="() => OpenNetwork(network)">
+                        <div class="pulse-top">
+                            <span class="pulse-name">@network.Name</span>
+                            <span class="status-badge @StatusClass(network.Status)">@network.Status</span>
+                        </div>
+                        <div class="pulse-metrics">
+                            <div>
+                                <span>Gas</span>
+                                <strong>@network.GasFee @network.GasUnit</strong>
+                            </div>
+                            <div>
+                                <span>TPS</span>
+                                <strong>@network.TransactionsPerSecond.ToString("N0")</strong>
+                            </div>
+                        </div>
+                    </button>
+                }
+            </div>
+        }
+    </section>
 </div>
 
-<CookieConsent/>
-@code {
-    [Inject] NavigationManager Navigation { get; set; }
+<CookieConsent />
 
-    void NavigateToExplore()
+@code {
+    private List<Network> Featured = new();
+
+    protected override async Task OnInitializedAsync()
     {
-        Navigation.NavigateTo("/Networks");
+        var all = await NetworkService.GetNetworksAsync();
+        Featured = all.Take(3).ToList();
     }
+
+    private void GoNetworks() => Navigation.NavigateTo("/Networks");
+
+    private void OpenNetwork(Network network) =>
+        Navigation.NavigateTo($"/Networks/{network.Slug}");
+
+    private static string StatusClass(NetworkStatus status) => status switch
+    {
+        NetworkStatus.Healthy => "is-healthy",
+        NetworkStatus.Degraded => "is-degraded",
+        NetworkStatus.Offline => "is-offline",
+        NetworkStatus.Maintenance => "is-maintenance",
+        _ => "is-unknown"
+    };
 }

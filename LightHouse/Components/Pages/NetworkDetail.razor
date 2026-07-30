@@ -1,0 +1,139 @@
+@page "/Networks/{Slug}"
+@rendermode InteractiveServer
+@using LightHouse.Core.Models
+@inject INetworkService NetworkService
+@inject NavigationManager Navigation
+
+<PageTitle>@(Network?.Name ?? "Network") — The Lighthouse</PageTitle>
+
+@if (IsLoading)
+{
+    <div class="detail-page">
+        <div class="detail-skeleton"></div>
+    </div>
+}
+else if (Network is null)
+{
+    <div class="detail-page">
+        <div class="not-found">
+            <h1>Network not found</h1>
+            <p>We couldn’t find a network for “@Slug”.</p>
+            <button type="button" class="back-btn" @onclick="GoBack">Back to networks</button>
+        </div>
+    </div>
+}
+else
+{
+    <div class="detail-page">
+        <button type="button" class="back-link" @onclick="GoBack">← Networks</button>
+
+        <header class="detail-header">
+            <div class="identity">
+                <div class="logo-wrap">
+                    <img src="@Network.LogoUrl" alt="" class="network-logo"
+                         onerror="this.style.display='none'; this.parentElement.classList.add('fallback');" />
+                    <span class="logo-fallback">@(string.IsNullOrEmpty(Network.Symbol) ? "?" : Network.Symbol[..1])</span>
+                </div>
+                <div>
+                    <p class="eyebrow">Network detail</p>
+                    <h1>@Network.Name</h1>
+                    <p class="symbol-line">@Network.Symbol · Chain @Network.ChainId · @(Network.IsEvm ? "EVM" : "Non-EVM")</p>
+                </div>
+            </div>
+            <span class="status-badge @StatusClass">@Network.Status</span>
+        </header>
+
+        <p class="description">@Network.Description</p>
+
+        <div class="stat-grid">
+            <div class="stat">
+                <span>Gas fee</span>
+                <strong>@FormatGas(Network.GasFee) <small>@Network.GasUnit</small></strong>
+            </div>
+            <div class="stat">
+                <span>Throughput</span>
+                <strong>@Network.TransactionsPerSecond.ToString("N0") <small>TPS</small></strong>
+            </div>
+            <div class="stat">
+                <span>Congestion</span>
+                <strong class="@CongestionClass">@Network.Congestion</strong>
+            </div>
+            <div class="stat">
+                <span>Finality</span>
+                <strong>@Network.FinalitySeconds <small>sec</small></strong>
+            </div>
+            <div class="stat">
+                <span>Reliability</span>
+                <strong>@Network.ReliabilityScore <small>/ 100</small></strong>
+            </div>
+            <div class="stat">
+                <span>Updated</span>
+                <strong>@Network.LastUpdated.ToLocalTime().ToString("HH:mm:ss")</strong>
+            </div>
+        </div>
+
+        <div class="detail-actions">
+            @if (!string.IsNullOrWhiteSpace(Network.ExplorerUrl))
+            {
+                <a class="explorer-btn" href="@Network.ExplorerUrl" target="_blank" rel="noopener noreferrer">
+                    Open explorer
+                </a>
+            }
+            <button type="button" class="ghost-btn" @onclick="GoBack">Back to list</button>
+        </div>
+
+        <aside class="status-note @StatusClass">
+            @StatusMessage
+        </aside>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string Slug { get; set; } = string.Empty;
+
+    private Network? Network;
+    private bool IsLoading = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        IsLoading = true;
+        Network = await NetworkService.GetNetworkBySlugAsync(Slug);
+        IsLoading = false;
+    }
+
+    private void GoBack() => Navigation.NavigateTo("/Networks");
+
+    private string StatusClass => Network?.Status switch
+    {
+        NetworkStatus.Healthy => "is-healthy",
+        NetworkStatus.Degraded => "is-degraded",
+        NetworkStatus.Offline => "is-offline",
+        NetworkStatus.Maintenance => "is-maintenance",
+        _ => "is-unknown"
+    };
+
+    private string CongestionClass => Network?.Congestion switch
+    {
+        CongestionLevel.Low => "cong-low",
+        CongestionLevel.Medium => "cong-medium",
+        CongestionLevel.High => "cong-high",
+        _ => string.Empty
+    };
+
+    private string StatusMessage => Network?.Status switch
+    {
+        NetworkStatus.Healthy => "Conditions look stable. Fees and throughput are within a normal range.",
+        NetworkStatus.Degraded => "Performance is uneven right now. Expect slower inclusion or higher fees.",
+        NetworkStatus.Offline => "This network appears unreachable from our checks. Avoid time-sensitive transfers.",
+        NetworkStatus.Maintenance => "Scheduled or emergency maintenance may be affecting availability.",
+        _ => "Status unavailable."
+    };
+
+    private static string FormatGas(decimal fee)
+    {
+        if (fee >= 1) return fee.ToString("0.##");
+        if (fee >= 0.01m) return fee.ToString("0.###");
+        return fee.ToString("0.#####");
+    }
+}
