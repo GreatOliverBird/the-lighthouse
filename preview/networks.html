@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Lighthouse — Networks Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --lh-bg: #050505;
+      --lh-surface: #111111;
+      --lh-surface-raised: #161616;
+      --lh-surface-muted: #0c0c0c;
+      --lh-border: #222222;
+      --lh-border-strong: #333333;
+      --lh-text: #f4f4f5;
+      --lh-text-muted: #a1a1aa;
+      --lh-text-faint: #71717a;
+      --lh-accent: #ff3b30;
+      --lh-radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "DM Sans", "Segoe UI", sans-serif;
+      background: var(--lh-bg);
+      color: var(--lh-text);
+    }
+
+    .preview-banner {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.65rem 1.25rem;
+      background: #0d0d0d;
+      border-bottom: 1px solid var(--lh-border);
+      font-size: 0.8rem;
+      color: var(--lh-text-muted);
+    }
+
+    .preview-banner strong { color: var(--lh-text); font-weight: 600; }
+
+    .networks-page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1.5rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .eyebrow {
+      margin: 0 0 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--lh-accent);
+    }
+
+    .page-header h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 2.75rem);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+    }
+
+    .subtitle {
+      margin: 0.65rem 0 0;
+      max-width: 36rem;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: var(--lh-text-muted);
+    }
+
+    .meta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.45rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid var(--lh-border);
+      background: var(--lh-surface);
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--lh-text-muted);
+      white-space: nowrap;
+    }
+
+    .meta-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.18);
+    }
+
+    .toolbar { margin-bottom: 1.5rem; }
+
+    .search-field {
+      position: relative;
+      display: block;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.95rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--lh-text-faint);
+      pointer-events: none;
+    }
+
+    .search-field input {
+      width: 100%;
+      padding: 0.85rem 1rem 0.85rem 2.6rem;
+      border: 1px solid var(--lh-border);
+      border-radius: 12px;
+      background: var(--lh-surface);
+      color: var(--lh-text);
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .search-field input::placeholder { color: var(--lh-text-faint); }
+    .search-field input:focus {
+      border-color: var(--lh-accent);
+      background: var(--lh-surface-raised);
+    }
+
+    .network-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .network-card {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      height: 100%;
+      padding: 1.35rem 1.4rem 1.25rem;
+      background: var(--lh-surface);
+      border: 1px solid var(--lh-border);
+      border-radius: var(--lh-radius);
+      transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+    }
+
+    .network-card:hover {
+      border-color: var(--lh-border-strong);
+      background: var(--lh-surface-raised);
+      transform: translateY(-2px);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .network-identity {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      min-width: 0;
+    }
+
+    .logo-wrap {
+      position: relative;
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--lh-surface-muted);
+      border: 1px solid var(--lh-border);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .logo-wrap svg { width: 28px; height: 28px; }
+
+    .network-name {
+      margin: 0;
+      font-size: 1.125rem;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .network-symbol {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--lh-text-muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .status-badge {
+      flex-shrink: 0;
+      padding: 0.28rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 650;
+      background: rgba(52, 211, 153, 0.12);
+      color: #34d399;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem 1rem;
+      padding: 1rem 0;
+      border-top: 1px solid var(--lh-border);
+      border-bottom: 1px solid var(--lh-border);
+    }
+
+    .metric { display: flex; flex-direction: column; gap: 0.35rem; }
+
+    .metric-label {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--lh-text-faint);
+    }
+
+    .metric-value {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .metric-value .unit {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--lh-text-muted);
+      margin-left: 0.15rem;
+    }
+
+    .cong-low { color: #34d399; }
+    .cong-medium { color: #fbbf24; }
+
+    .card-footer {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .last-update {
+      font-size: 0.75rem;
+      color: var(--lh-text-faint);
+    }
+
+    .details-btn {
+      width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.75rem 1rem;
+      background: transparent;
+      border: 1px solid var(--lh-border-strong);
+      border-radius: 10px;
+      color: var(--lh-text);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .details-btn:hover {
+      background: var(--lh-text);
+      border-color: var(--lh-text);
+      color: #0a0a0a;
+    }
+
+    .details-btn .arrow { transition: transform 0.2s ease; }
+    .details-btn:hover .arrow { transform: translateX(3px); }
+
+    .empty {
+      display: none;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.85rem;
+      padding: 2.5rem 1.25rem;
+      border: 1px dashed var(--lh-border-strong);
+      border-radius: var(--lh-radius);
+      background: var(--lh-surface);
+      color: var(--lh-text-muted);
+    }
+
+    .clear-btn {
+      padding: 0.55rem 0.9rem;
+      border-radius: 8px;
+      border: 1px solid var(--lh-border-strong);
+      background: transparent;
+      color: var(--lh-text);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    @media (max-width: 960px) {
+      .network-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 640px) {
+      .networks-page { padding: 1.75rem 1rem 3rem; }
+      .page-header { flex-direction: column; align-items: flex-start; }
+      .network-grid { grid-template-columns: 1fr; }
+      .search-field { max-width: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-banner">
+    <span><strong>Static preview</strong> — بدون نیاز به .NET SDK</span>
+    <span>فایل: preview/networks.html</span>
+  </div>
+
+  <div class="networks-page">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Live overview</p>
+        <h1>Networks</h1>
+        <p class="subtitle">Status, fees, and throughput across the major blockchain networks.</p>
+      </div>
+      <div class="header-meta">
+        <span class="meta-pill"><span class="meta-dot"></span><span id="count">5 networks</span></span>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <label class="search-field">
+        <span class="search-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+            <path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <input id="search" type="search" placeholder="Search by name or symbol..." autocomplete="off" />
+      </label>
+    </div>
+
+    <div id="grid" class="network-grid"></div>
+    <div id="empty" class="empty">
+      <p>No networks match your search.</p>
+      <button type="button" class="clear-btn" id="clear">Clear search</button>
+    </div>
+  </div>
+
+  <script>
+    const networks = [
+      { name: "Ethereum", symbol: "ETH", gas: "2.31", unit: "Gwei", tps: "15", congestion: "Low", congClass: "cong-low", finality: "12", logo: "eth" },
+      { name: "Base", symbol: "ETH", gas: "0.05", unit: "Gwei", tps: "180", congestion: "Low", congClass: "cong-low", finality: "2", logo: "base" },
+      { name: "Arbitrum", symbol: "ETH", gas: "0.08", unit: "Gwei", tps: "150", congestion: "Low", congClass: "cong-low", finality: "2", logo: "arb" },
+      { name: "Polygon", symbol: "POL", gas: "35", unit: "Gwei", tps: "250", congestion: "Medium", congClass: "cong-medium", finality: "2", logo: "pol" },
+      { name: "Solana", symbol: "SOL", gas: "0.00001", unit: "SOL", tps: "3,000", congestion: "Low", congClass: "cong-low", finality: "1", logo: "sol" },
+    ];
+
+    const logos = {
+      eth: `<svg viewBox="0 0 32 32" fill="none"><path d="M16 3L15.7 4.1V21.5L16 21.8L24.5 16.6L16 3Z" fill="#E8E8E8"/><path d="M16 3L7.5 16.6L16 21.8V12.8V3Z" fill="#fff"/><path d="M16 23.5L15.8 23.7V28.7L16 29.2L24.5 18.3L16 23.5Z" fill="#E8E8E8"/><path d="M16 29.2V23.5L7.5 18.3L16 29.2Z" fill="#fff"/><path d="M16 21.8L24.5 16.6L16 12.8V21.8Z" fill="#A0A0A0"/><path d="M7.5 16.6L16 21.8V12.8L7.5 16.6Z" fill="#C8C8C8"/></svg>`,
+      base: `<svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="12" fill="#0052FF"/><path d="M16.2 22.5c3.6 0 6.5-2.9 6.5-6.5S19.8 9.5 16.2 9.5c-3.2 0-5.9 2.3-6.4 5.4h8.5v2.2H9.8c.5 3.1 3.2 5.4 6.4 5.4z" fill="#fff"/></svg>`,
+      arb: `<svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="12" fill="#213147"/><path d="M10.5 21.5L16 8.5l5.5 13H18l-2-5-2 5h-3.5z" fill="#28A0F0"/><path d="M13.2 18.8h5.6L16 12.2l-2.8 6.6z" fill="#9DCCED"/></svg>`,
+      pol: `<svg viewBox="0 0 32 32" fill="none"><path d="M21.3 11.2c-.4-.2-.9-.2-1.3 0l-3.2 1.9-2.2 1.2-3.2 1.9c-.4.2-.7.7-.7 1.2v3.7c0 .5.3 1 .7 1.2l3.2 1.9c.4.2.9.2 1.3 0l3.2-1.9 2.2-1.2 3.2-1.9c.4-.2.7-.7.7-1.2v-3.7c0-.5-.3-1-.7-1.2l-3.2-1.9z" fill="#8247E5"/></svg>`,
+      sol: `<svg viewBox="0 0 32 32" fill="none"><defs><linearGradient id="s" x1="4" y1="28" x2="28" y2="4"><stop stop-color="#9945FF"/><stop offset=".5" stop-color="#14F195"/><stop offset="1" stop-color="#00D18C"/></linearGradient></defs><path d="M9.2 21.2c.2-.2.4-.3.7-.3h14.4c.4 0 .7.5.3.9l-2.8 2.8c-.2.2-.4.3-.7.3H6.7c-.4 0-.7-.5-.3-.9l2.8-2.8z" fill="url(#s)"/><path d="M9.2 7.4c.2-.2.4-.3.7-.3h14.4c.4 0 .7.5.3.9l-2.8 2.8c-.2.2-.4.3-.7.3H6.7c-.4 0-.7-.5-.3-.9l2.8-2.8z" fill="url(#s)"/><path d="M22.8 14.2c-.2-.2-.4-.3-.7-.3H7.7c-.4 0-.7.5-.3.9l2.8 2.8c.2.2.4.3.7.3h14.4c.4 0 .7-.5.3-.9l-2.8-2.8z" fill="url(#s)"/></svg>`,
+    };
+
+    const grid = document.getElementById("grid");
+    const empty = document.getElementById("empty");
+    const count = document.getElementById("count");
+    const search = document.getElementById("search");
+    const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
+    function card(n) {
+      return `<article class="network-card" data-name="${n.name}" data-symbol="${n.symbol}">
+        <header class="card-header">
+          <div class="network-identity">
+            <div class="logo-wrap">${logos[n.logo]}</div>
+            <div>
+              <h2 class="network-name">${n.name}</h2>
+              <div class="network-symbol">${n.symbol}</div>
+            </div>
+          </div>
+          <span class="status-badge">Healthy</span>
+        </header>
+        <div class="metrics">
+          <div class="metric"><span class="metric-label">Gas Fee</span><strong class="metric-value">${n.gas} <span class="unit">${n.unit}</span></strong></div>
+          <div class="metric"><span class="metric-label">TPS</span><strong class="metric-value">${n.tps}</strong></div>
+          <div class="metric"><span class="metric-label">Congestion</span><strong class="metric-value ${n.congClass}">${n.congestion}</strong></div>
+          <div class="metric"><span class="metric-label">Finality</span><strong class="metric-value">${n.finality}<span class="unit">s</span></strong></div>
+        </div>
+        <footer class="card-footer">
+          <time class="last-update">Updated ${now}</time>
+          <button type="button" class="details-btn">View details <span class="arrow">→</span></button>
+        </footer>
+      </article>`;
+    }
+
+    function render(list) {
+      grid.innerHTML = list.map(card).join("");
+      count.textContent = `${list.length} network${list.length === 1 ? "" : "s"}`;
+      grid.style.display = list.length ? "grid" : "none";
+      empty.style.display = list.length ? "none" : "flex";
+    }
+
+    search.addEventListener("input", () => {
+      const q = search.value.trim().toLowerCase();
+      render(networks.filter(n => !q || n.name.toLowerCase().includes(q) || n.symbol.toLowerCase().includes(q)));
+    });
+
+    document.getElementById("clear").addEventListener("click", () => {
+      search.value = "";
+      render(networks);
+    });
+
+    render(networks);
+  </script>
+</body>
+</html>

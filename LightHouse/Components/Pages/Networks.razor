@@ -1,57 +1,99 @@
 @page "/Networks"
+@rendermode InteractiveServer
 @using LightHouse.Core.Models
 
-@inject INetworkService NetworkService 
-
+@inject INetworkService NetworkService
 
 <PageTitle>Networks</PageTitle>
 
 <div class="networks-page">
+    <header class="page-header">
+        <div class="header-copy">
+            <p class="eyebrow">Live overview</p>
+            <h1>Networks</h1>
+            <p class="subtitle">
+                Status, fees, and throughput across the major blockchain networks.
+            </p>
+        </div>
 
-    <div class="page-header">
+        <div class="header-meta" aria-live="polite">
+            <span class="meta-pill">
+                <span class="meta-dot"></span>
+                @FilteredNetworks.Count networks
+            </span>
+        </div>
+    </header>
 
-        <h1>NETWORKS</h1>
-
-        <p>
-            Live status of the world's largest blockchain networks.
-        </p>
-
+    <div class="toolbar">
+        <label class="search-field">
+            <span class="search-icon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+                    <path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </span>
+            <input type="search"
+                   value="@SearchQuery"
+                   @oninput="OnSearchInput"
+                   placeholder="Search by name or symbol..."
+                   autocomplete="off" />
+        </label>
     </div>
 
-    <div class="search-container">
-
-        <input
-            type="text"
-            placeholder="Search network..." />
-
-    </div>
-
-    <div class="network-grid">
-
-        @if (NetworkList.Count == 0)
-        {
-            <p>Loading networks...</p>
-        }
-        else
-        {
-            @foreach (var network in NetworkList)
+    @if (IsLoading)
+    {
+        <div class="state-block" role="status">
+            <div class="skeleton-grid">
+                @for (var i = 0; i < 5; i++)
+                {
+                    <div class="skeleton-card"></div>
+                }
+            </div>
+        </div>
+    }
+    else if (FilteredNetworks.Count == 0)
+    {
+        <div class="state-block empty">
+            <p>No networks match “@SearchQuery”.</p>
+            <button type="button" class="clear-btn" @onclick="ClearSearch">Clear search</button>
+        </div>
+    }
+    else
+    {
+        <div class="network-grid">
+            @foreach (var network in FilteredNetworks)
             {
                 <NetworkCard Network="network" />
             }
-        }
-
-    </div>
-
+        </div>
+    }
 </div>
 
-
 @code {
-
     private List<Network> NetworkList = new();
+    private string SearchQuery = string.Empty;
+    private bool IsLoading = true;
+
+    private List<Network> FilteredNetworks =>
+        string.IsNullOrWhiteSpace(SearchQuery)
+            ? NetworkList
+            : NetworkList.Where(n =>
+                n.Name.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
+                n.Symbol.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
 
     protected override async Task OnInitializedAsync()
     {
         NetworkList = await NetworkService.GetNetworksAsync();
+        IsLoading = false;
     }
 
+    private void OnSearchInput(ChangeEventArgs e)
+    {
+        SearchQuery = e.Value?.ToString() ?? string.Empty;
+    }
+
+    private void ClearSearch()
+    {
+        SearchQuery = string.Empty;
+    }
 }
